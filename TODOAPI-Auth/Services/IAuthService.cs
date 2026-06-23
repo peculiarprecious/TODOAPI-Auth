@@ -5,7 +5,7 @@ namespace TODOAPI_Auth.Services
 {
     public interface IAuthService
     {
-        Task<AuthResponseDTO> RegisterAsync(UserRegisterDTO registerDto);
-        Task<AuthResponseDTO> LoginAsync(LoginDTO loginDto);
+        Task<AuthResponseDTO?> RegisterAsync(UserRegisterDTO registerDto);
+        Task<AuthResponseDTO?> LoginAsync(LoginDTO loginDto);
     }
 }

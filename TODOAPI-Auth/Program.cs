@@ -1,9 +1,11 @@
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
+using System.IdentityModel.Tokens.Jwt;
 using System.Text;
 using TODOAPI_Auth.DatabaseContext;
 using TODOAPI_Auth.Helpers;
+using TODOAPI_Auth.Services;
 var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
@@ -21,6 +23,7 @@ builder.Services.AddSwaggerGen();
 
 // REGISTER JWT HELPER HERE 
 builder.Services.AddScoped<IJWTHelper, JWTHelper>();
+builder.Services.AddScoped<IAuthService, AuthService>();
 
 var app = builder.Build();
 
