@@ -75,6 +75,7 @@ namespace TODOAPI_Auth.Services
 
             return new AuthResponseDTO
             {
+                UserId = user.Id,
                 Token = token,
                 Username = $"{user.firstName} {user.lastName}".Trim(),
                 Email = user.email,
