@@ -13,6 +13,7 @@ var builder = WebApplication.CreateBuilder(args);
 builder.Services.AddScoped<IJWTHelper, JWTHelper>();
 builder.Services.AddScoped<IAuthService, AuthService>();
 builder.Services.AddScoped<ITodoService, TodoService>();
+builder.Services.AddHttpClient<WeatherService>();
 
 // 2. Register Database Context
 builder.Services.AddDbContext<ApplicationDbContext>(options =>

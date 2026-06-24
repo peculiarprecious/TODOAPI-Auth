@@ -114,20 +114,37 @@ namespace TODOAPI_Auth.Controllers
             return NoContent(); 
         }
 
+        [HttpGet("suggestions/weather")] // GET: api/todoitems/suggestions/weather?city=Lagos
+        public async Task<IActionResult> GetWeatherSuggestions(
+    [FromQuery] string city,
+    [FromServices] WeatherService weatherService)
+        {
+            if (string.IsNullOrWhiteSpace(city))
+            {
+                return BadRequest(BuildErrorResponse(400, "City name parameter cannot be blank."));
+            }
+
+            var weather = await weatherService.GetWeatherAsync(city);
+
+            // Defensive Validation: Handles invalid cities cleanly
+            if (weather == null)
+            {
+                return NotFound(BuildErrorResponse(404, $"Could not find or retrieve weather details for city: '{city}'."));
+            }
+
+            // Dynamic suggestions based on current temp data
+            var suggestions = weather.Temperature > 20
+                ? new[] { "Go for a walk", "Play outdoor sports", "Have a picnic", "Visit a park" }
+                : new[] { "Indoor exercise", "Watch a movie", "Read a book", "Cook a meal" };
+
+            return Ok(new
+            {
+                weather,
+                suggestions
+            });
+        }
 
 
-        //private int GetUserIdFromClaims()
-        //{
-        //    // Extracts the "NameIdentifier" claim embedded into the JWT token inside JwtHelper.cs
-        //    var userIdClaim = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
-
-        //    if (string.IsNullOrEmpty(userIdClaim) || !int.TryParse(userIdClaim, out int userId))
-        //    {
-        //        throw new UnauthorizedAccessException("User identification token is missing or corrupted.");
-        //    }
-
-        //    return userId;
-        //}
         private int GetUserIdFromClaims()
         {
             // 1. Check if the User identity context or claims exist at all
