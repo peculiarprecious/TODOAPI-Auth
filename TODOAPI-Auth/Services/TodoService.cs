@@ -13,10 +13,12 @@ namespace TODOAPI_Auth.Services
     public class TodoService : ITodoService
     {
         private readonly ApplicationDbContext _context;
+        private readonly SlackService _slackService;
 
-        public TodoService(ApplicationDbContext context)
+        public TodoService(ApplicationDbContext context, SlackService slackService)
         {
             _context = context;
+            _slackService = slackService;
         }
 
         private static TodoResponseDto MapToResponse(TodoItem todo)
@@ -177,17 +179,25 @@ namespace TODOAPI_Auth.Services
         // 6. Create Todo
         public async Task<TodoResponseDto> CreateAsync(int userId, CreateTodoDTO dto)
         {
+            // ✅ Check user exists before creating todo
+            var user = await _context.Users.FindAsync(userId);
+            if (user == null)
+                throw new Exception($"User with id {userId} not found");
+
             var todo = new TodoItem
             {
                 Title = dto.Title,
                 Description = dto.Description,
                 DueDate = dto.DueDate,
                 Priority = dto.Priority,
-                UserId = userId
+                UserId = userId,
+                CreatedAt = DateTime.Now 
             };
 
             _context.TodoItems.Add(todo);
             await _context.SaveChangesAsync();
+
+            _ = _slackService.NotifyTodoCreatedAsync(todo, user);
 
             return MapToResponse(todo);
         }
@@ -200,6 +210,9 @@ namespace TODOAPI_Auth.Services
 
             if (todo == null) return null;
 
+            // Track state change before updating
+            bool wasCompleted = todo.IsCompleted;
+
             todo.Title = dto.Title;
             todo.Description = dto.Description;
             todo.DueDate = dto.DueDate;
@@ -207,6 +220,11 @@ namespace TODOAPI_Auth.Services
             todo.IsCompleted = dto.IsCompleted;
 
             await _context.SaveChangesAsync();
+
+            if (!wasCompleted && todo.IsCompleted)
+            {
+                _ = _slackService.NotifyTodoCompletedAsync(todo); 
+            }
             return MapToResponse(todo);
         }
 
@@ -218,8 +236,16 @@ namespace TODOAPI_Auth.Services
 
             if (todo == null) return false;
 
+            var todoSnapshot = new TodoItem
+            {
+                Title = todo.Title,
+                Priority = todo.Priority
+            };
+
             _context.TodoItems.Remove(todo);
             await _context.SaveChangesAsync();
+
+            _ = _slackService.NotifyTodoDeletedAsync(todoSnapshot);
             return true;
         }
     }

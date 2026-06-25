@@ -14,6 +14,13 @@ builder.Services.AddScoped<IJWTHelper, JWTHelper>();
 builder.Services.AddScoped<IAuthService, AuthService>();
 builder.Services.AddScoped<ITodoService, TodoService>();
 builder.Services.AddHttpClient<WeatherService>();
+//builder.Services.AddHttpClient<SlackService>();
+builder.Services.AddHttpClient<SlackService>()
+    .ConfigurePrimaryHttpMessageHandler(() => new HttpClientHandler
+    {
+        ServerCertificateCustomValidationCallback = (message, cert, chain, errors) => true
+    });
+
 
 // 2. Register Database Context
 builder.Services.AddDbContext<ApplicationDbContext>(options =>
