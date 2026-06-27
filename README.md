@@ -66,7 +66,7 @@ TODOAPI-Auth/
 
 ---
 
-## 🗄️ Database Setup
+## Database Setup
 
 ### Prerequisites
 - .NET 8 SDK
@@ -117,7 +117,7 @@ dotnet run
 
 ---
 
-## 🔐 Authentication
+## Authentication
 
 This API uses **JWT Bearer Authentication**. All todo endpoints require a valid token.
 
@@ -171,7 +171,7 @@ Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...
 
 ---
 
-## 📌 Todo Endpoints
+## Todo Endpoints
 
 Base URL: `https://localhost:7064/api/TodoItems`
 
@@ -250,7 +250,7 @@ Response `200 OK`:
 
 ---
 
-## 🌤️ External APIs
+## External APIs
 
 ---
 
@@ -338,24 +338,24 @@ https://hooks.slack.com/services/YOUR/WEBHOOK/URL
 
 #### Notification Examples
 
-**📝 Todo Created** (Blue `#3498db`):
+** Todo Created** (Blue `#3498db`):
 ```
-📝 New TODO Created
+New TODO Created
 Title:       Buy groceries
 Priority:    High          Created By: Precious Nwajei
 Due Date:    2026-12-01
 ```
 
-**✅ Todo Completed** (Green `#2ecc71`):
+** Todo Completed** (Green `#2ecc71`):
 ```
-✅ TODO Completed
+ TODO Completed
 Title:          Buy groceries
 Completed By:   Precious      Priority: High
 ```
 
-**🗑️ Todo Deleted** (Red `#e74c3c`):
+**Todo Deleted** (Red `#e74c3c`):
 ```
-🗑️ TODO Deleted
+ TODO Deleted
 Title:      Buy groceries
 Priority:   High
 ```
@@ -437,14 +437,14 @@ Sync todos with due dates to Google Calendar as events.
 }
 ```
 
-> ⚠️ Access tokens expire after ~1 hour. Refresh via OAuth Playground when needed.
+> Access tokens expire after ~1 hour. Refresh via OAuth Playground when needed.
 
 #### How It Works
 When a todo with a `DueDate` is created, a Google Calendar event is automatically created:
 
 ---
 
-## 🔔 Webhook Endpoints
+##  Webhook Endpoints
 
 Receive HTTP notifications from external services.
 
@@ -453,19 +453,6 @@ Receive HTTP notifications from external services.
 | `POST` | `/api/Webhooks/todo-created` | Receive todo created event |
 | `POST` | `/api/Webhooks/github-issue` | Receive GitHub issue events |
 
-### How to Set Up Webhooks
-
-Webhooks are HTTP POST requests sent by external services to your API.
-To receive them locally use **ngrok**:
-
-```bash
-# Install ngrok
-# Then expose your local API
-ngrok http 7064
-
-# You'll get a public URL like:
-# https://abc123.ngrok.io
-```
 
 Use that URL as your webhook endpoint:
 ```
@@ -546,11 +533,11 @@ Receives GitHub issue events (opened, closed, reopened).
 }
 ```
 
-> 💡 When a GitHub issue is **closed**, the matching todo `[GH-1]` is automatically marked as complete!
+> When a GitHub issue is **closed**, the matching todo `[GH-1]` is automatically marked as complete!
 
 ---
 
-## ⚙️ Configuration
+##  Configuration
 
 All secrets use placeholders in `appsettings.json`.
 Create `appsettings.Development.json` with real values — **never commit this file!**
@@ -593,7 +580,7 @@ Create `appsettings.Development.json` with real values — **never commit this f
 
 ---
 
-## 🔢 HTTP Status Codes
+##  HTTP Status Codes
 
 | Code | Meaning |
 |---|---|
@@ -608,7 +595,7 @@ Create `appsettings.Development.json` with real values — **never commit this f
 
 ---
 
-## 🔄 Architecture
+##  Architecture
 
 ```
 HTTP Request
@@ -628,15 +615,10 @@ Fire & Forget → Slack / Google Calendar notifications
 
 ---
 
-## 👩‍💻 Author
+##  Author
 
 **Precious Nwajei**
 - GitHub: [@peculiarprecious](https://github.com/peculiarprecious)
-- AGH University of Science and Technology, Krakow, Poland
-- UNESCO Fellowship Recipient
 
 ---
 
-## 📄 License
-
-This project is open source and available under the [MIT License](LICENSE).
