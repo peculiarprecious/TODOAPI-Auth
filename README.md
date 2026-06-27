@@ -453,13 +453,6 @@ Receive HTTP notifications from external services.
 | `POST` | `/api/Webhooks/todo-created` | Receive todo created event |
 | `POST` | `/api/Webhooks/github-issue` | Receive GitHub issue events |
 
-
-Use that URL as your webhook endpoint:
-```
-https://abc123.ngrok.io/api/Webhooks/todo-created
-https://abc123.ngrok.io/api/Webhooks/github-issue
-```
-
 ---
 
 ### POST /api/Webhooks/todo-created
