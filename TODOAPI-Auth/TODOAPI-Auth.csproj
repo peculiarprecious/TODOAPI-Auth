@@ -5,6 +5,7 @@
     <Nullable>enable</Nullable>
     <ImplicitUsings>enable</ImplicitUsings>
     <RootNamespace>TODOAPI_Auth</RootNamespace>
+    <UserSecretsId>04ad40ea-5152-4b19-9864-e46d91056f22</UserSecretsId>
   </PropertyGroup>
 
   <ItemGroup>

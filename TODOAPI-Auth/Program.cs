@@ -20,7 +20,12 @@ builder.Services.AddHttpClient<SlackService>()
     {
         ServerCertificateCustomValidationCallback = (message, cert, chain, errors) => true
     });
-
+builder.Services.AddHttpClient<GitHubService>()
+    .ConfigurePrimaryHttpMessageHandler(() => new HttpClientHandler
+    {
+        ServerCertificateCustomValidationCallback =
+            (message, cert, chain, errors) => true
+    });
 
 // 2. Register Database Context
 builder.Services.AddDbContext<ApplicationDbContext>(options =>

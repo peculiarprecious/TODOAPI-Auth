@@ -1,7 +1,10 @@
 ﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
 using System.Security.Claims;
+using TODOAPI_Auth.DatabaseContext;
 using TODOAPI_Auth.DTOs.TODODTO;
+using TODOAPI_Auth.Models;
 using TODOAPI_Auth.Services;
 
 namespace TODOAPI_Auth.Controllers
@@ -143,6 +146,62 @@ namespace TODOAPI_Auth.Controllers
                 suggestions
             });
         }
+
+        [HttpPost("import-github-issues")] // POST: api/todoitems/import-github-issues
+        public async Task<IActionResult> ImportGitHubIssues(
+            [FromServices] GitHubService gitHubService,
+            [FromServices] ApplicationDbContext context) 
+        {
+            int userId = GetUserIdFromClaims();
+            var issues = await gitHubService.GetOpenIssuesAsync();
+
+            if (issues == null)
+            {
+                return BadRequest(BuildErrorResponse(400, "Failed to retrieve open issues from GitHub. Check token configurations."));
+            }
+
+            int createdCount = 0;
+
+            foreach (var issue in issues)
+            {
+                string issueTag = $"[GH-{issue.Number}]";
+
+                var exists = await context.TodoItems.AnyAsync(t => t.UserId == userId && t.Title.Contains(issueTag));
+
+                if (exists) continue;
+
+                string priority = "Medium";
+                if (issue.Labels.Any(l => l.Equals("urgent", StringComparison.OrdinalIgnoreCase) || l.Equals("high", StringComparison.OrdinalIgnoreCase)))
+                {
+                    priority = "High";
+                }
+                else if (issue.Labels.Any(l => l.Equals("low", StringComparison.OrdinalIgnoreCase)))
+                {
+                    priority = "Low";
+                }
+
+                var todo = new TodoItem
+                {
+                    Title = $"{issueTag} {issue.Title}",
+                    Description = $"{issue.Body}\n\nGitHub Issue Reference: {issue.Url}",
+                    Priority = priority,
+                    UserId = userId,
+                    CreatedAt = DateTime.UtcNow,
+                    IsCompleted = false,
+                    DueDate = DateTime.UtcNow.AddDays(7)
+                };
+                context.TodoItems.Add(todo);
+                createdCount++;
+            }
+
+            if (createdCount > 0)
+            {
+                await context.SaveChangesAsync();
+            }
+
+            return Ok(new { CreatedTodos = createdCount });
+        }
+
 
 
         private int GetUserIdFromClaims()
