@@ -1,0 +1,632 @@
+{
+  "info": {
+    "name": "TODOAPI-Auth - Complete Collection",
+    "_postman_id": "todoapi-auth-complete",
+    "description": "Complete Postman collection for TODOAPI-Auth with Authentication, CRUD, Weather, Slack, GitHub and Webhook integrations",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "variable": [
+    {
+      "key": "baseUrl",
+      "value": "https://localhost:7064",
+      "type": "string"
+    },
+    {
+      "key": "token",
+      "value": "",
+      "type": "string"
+    }
+  ],
+  "item": [
+    {
+      "name": "1. Auth",
+      "item": [
+        {
+          "name": "POST Register",
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"firstName\": \"Precious\",\n  \"lastName\": \"Nwajei\",\n  \"email\": \"precious@example.com\",\n  \"password\": \"Password123!\"\n}",
+              "options": { "raw": { "language": "json" } }
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/Auth/register",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "Auth", "register"]
+            },
+            "description": "Register a new user. Expected: 201 Created with JWT token"
+          },
+          "response": []
+        },
+        {
+          "name": "POST Login",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "var json = pm.response.json();",
+                  "if (json.token) {",
+                  "    pm.collectionVariables.set('token', json.token);",
+                  "    console.log('Token saved!');",
+                  "}"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"email\": \"precious@example.com\",\n  \"password\": \"Password123!\"\n}",
+              "options": { "raw": { "language": "json" } }
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/Auth/login",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "Auth", "login"]
+            },
+            "description": "Login and get JWT token. Token is auto-saved to collection variable. Expected: 200 OK"
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "2. Todo CRUD",
+      "item": [
+        {
+          "name": "GET All Todos (Admin)",
+          "request": {
+            "method": "GET",
+            "header": [
+              { "key": "Authorization", "value": "Bearer {{token}}" }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/TodoItems/all",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "TodoItems", "all"]
+            },
+            "description": "Get ALL todos - admin view. Expected: 200 OK"
+          },
+          "response": []
+        },
+        {
+          "name": "GET My Todos",
+          "request": {
+            "method": "GET",
+            "header": [
+              { "key": "Authorization", "value": "Bearer {{token}}" }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/TodoItems",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "TodoItems"]
+            },
+            "description": "Get logged-in user's todos. Expected: 200 OK"
+          },
+          "response": []
+        },
+        {
+          "name": "POST Create Todo (Valid)",
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Authorization", "value": "Bearer {{token}}" },
+              { "key": "Content-Type", "value": "application/json" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"title\": \"Buy groceries\",\n  \"description\": \"Milk, eggs and bread\",\n  \"dueDate\": \"2026-12-01T00:00:00Z\",\n  \"priority\": \"High\"\n}",
+              "options": { "raw": { "language": "json" } }
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/TodoItems",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "TodoItems"]
+            },
+            "description": "Create valid todo. Expected: 201 Created. Also triggers Slack notification!"
+          },
+          "response": []
+        },
+        {
+          "name": "POST Create Todo (Invalid - Empty Title)",
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Authorization", "value": "Bearer {{token}}" },
+              { "key": "Content-Type", "value": "application/json" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"title\": \"\",\n  \"description\": \"Missing title test\",\n  \"dueDate\": \"2026-12-01T00:00:00Z\",\n  \"priority\": \"High\"\n}",
+              "options": { "raw": { "language": "json" } }
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/TodoItems",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "TodoItems"]
+            },
+            "description": "Empty title. Expected: 400 Bad Request"
+          },
+          "response": []
+        },
+        {
+          "name": "POST Create Todo (Invalid - Past DueDate)",
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Authorization", "value": "Bearer {{token}}" },
+              { "key": "Content-Type", "value": "application/json" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"title\": \"Valid Title\",\n  \"description\": \"Past due date test\",\n  \"dueDate\": \"2020-01-01T00:00:00Z\",\n  \"priority\": \"Medium\"\n}",
+              "options": { "raw": { "language": "json" } }
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/TodoItems",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "TodoItems"]
+            },
+            "description": "Past due date. Expected: 400 Bad Request"
+          },
+          "response": []
+        },
+        {
+          "name": "POST Create Todo (Invalid - Wrong Priority)",
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Authorization", "value": "Bearer {{token}}" },
+              { "key": "Content-Type", "value": "application/json" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"title\": \"Valid Title\",\n  \"description\": \"Wrong priority test\",\n  \"dueDate\": \"2026-12-01T00:00:00Z\",\n  \"priority\": \"Urgent\"\n}",
+              "options": { "raw": { "language": "json" } }
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/TodoItems",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "TodoItems"]
+            },
+            "description": "Invalid priority. Expected: 400 Bad Request"
+          },
+          "response": []
+        },
+        {
+          "name": "GET Todo by ID (Exists)",
+          "request": {
+            "method": "GET",
+            "header": [
+              { "key": "Authorization", "value": "Bearer {{token}}" }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/TodoItems/1",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "TodoItems", "1"]
+            },
+            "description": "Get todo by ID 1. Expected: 200 OK"
+          },
+          "response": []
+        },
+        {
+          "name": "GET Todo by ID (404 Not Found)",
+          "request": {
+            "method": "GET",
+            "header": [
+              { "key": "Authorization", "value": "Bearer {{token}}" }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/TodoItems/999",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "TodoItems", "999"]
+            },
+            "description": "Non-existent ID. Expected: 404 Not Found"
+          },
+          "response": []
+        },
+        {
+          "name": "PUT Update Todo (Valid)",
+          "request": {
+            "method": "PUT",
+            "header": [
+              { "key": "Authorization", "value": "Bearer {{token}}" },
+              { "key": "Content-Type", "value": "application/json" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"title\": \"Buy groceries and cook dinner\",\n  \"description\": \"Updated description\",\n  \"isCompleted\": true,\n  \"dueDate\": \"2026-12-01T00:00:00Z\",\n  \"priority\": \"Medium\"\n}",
+              "options": { "raw": { "language": "json" } }
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/TodoItems/1",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "TodoItems", "1"]
+            },
+            "description": "Update todo. isCompleted=true triggers Slack completion notification. Expected: 200 OK"
+          },
+          "response": []
+        },
+        {
+          "name": "PUT Update Todo (Invalid Data)",
+          "request": {
+            "method": "PUT",
+            "header": [
+              { "key": "Authorization", "value": "Bearer {{token}}" },
+              { "key": "Content-Type", "value": "application/json" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"title\": \"AB\",\n  \"description\": \"Short title test\",\n  \"isCompleted\": false,\n  \"dueDate\": \"2026-12-01T00:00:00Z\",\n  \"priority\": \"Urgent\"\n}",
+              "options": { "raw": { "language": "json" } }
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/TodoItems/1",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "TodoItems", "1"]
+            },
+            "description": "Invalid update. Expected: 400 Bad Request"
+          },
+          "response": []
+        },
+        {
+          "name": "DELETE Todo (Success)",
+          "request": {
+            "method": "DELETE",
+            "header": [
+              { "key": "Authorization", "value": "Bearer {{token}}" }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/TodoItems/1",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "TodoItems", "1"]
+            },
+            "description": "Delete todo. Triggers Slack delete notification. Expected: 204 No Content"
+          },
+          "response": []
+        },
+        {
+          "name": "DELETE Todo (404 Not Found)",
+          "request": {
+            "method": "DELETE",
+            "header": [
+              { "key": "Authorization", "value": "Bearer {{token}}" }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/TodoItems/999",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "TodoItems", "999"]
+            },
+            "description": "Non-existent delete. Expected: 404 Not Found"
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "3. Search & Statistics",
+      "item": [
+        {
+          "name": "GET Statistics",
+          "request": {
+            "method": "GET",
+            "header": [
+              { "key": "Authorization", "value": "Bearer {{token}}" }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/TodoItems/statistics",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "TodoItems", "statistics"]
+            },
+            "description": "Get todo statistics. Expected: 200 OK"
+          },
+          "response": []
+        },
+        {
+          "name": "GET Search Todos",
+          "request": {
+            "method": "GET",
+            "header": [
+              { "key": "Authorization", "value": "Bearer {{token}}" }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/TodoItems/search?q=groceries",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "TodoItems", "search"],
+              "query": [{ "key": "q", "value": "groceries" }]
+            },
+            "description": "Search todos by keyword. Expected: 200 OK"
+          },
+          "response": []
+        },
+        {
+          "name": "GET Search Todos (No Results)",
+          "request": {
+            "method": "GET",
+            "header": [
+              { "key": "Authorization", "value": "Bearer {{token}}" }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/TodoItems/search?q=xyznotfound",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "TodoItems", "search"],
+              "query": [{ "key": "q", "value": "xyznotfound" }]
+            },
+            "description": "Search with no results. Expected: 200 OK with empty array"
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "4. Weather Integration",
+      "item": [
+        {
+          "name": "GET Weather Suggestions - Krakow",
+          "request": {
+            "method": "GET",
+            "header": [
+              { "key": "Authorization", "value": "Bearer {{token}}" }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/TodoItems/suggestions/weather?city=Krakow",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "TodoItems", "suggestions", "weather"],
+              "query": [{ "key": "city", "value": "Krakow" }]
+            },
+            "description": "Get weather-based todo suggestions for Krakow. Expected: 200 OK"
+          },
+          "response": []
+        },
+        {
+          "name": "GET Weather Suggestions - London",
+          "request": {
+            "method": "GET",
+            "header": [
+              { "key": "Authorization", "value": "Bearer {{token}}" }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/TodoItems/suggestions/weather?city=London",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "TodoItems", "suggestions", "weather"],
+              "query": [{ "key": "city", "value": "London" }]
+            },
+            "description": "Get weather suggestions for London. Expected: 200 OK"
+          },
+          "response": []
+        },
+        {
+          "name": "GET Weather Suggestions - Invalid City",
+          "request": {
+            "method": "GET",
+            "header": [
+              { "key": "Authorization", "value": "Bearer {{token}}" }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/TodoItems/suggestions/weather?city=InvalidCity123",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "TodoItems", "suggestions", "weather"],
+              "query": [{ "key": "city", "value": "InvalidCity123" }]
+            },
+            "description": "Invalid city name. Expected: 404 Not Found"
+          },
+          "response": []
+        },
+        {
+          "name": "GET Weather Suggestions - Missing City",
+          "request": {
+            "method": "GET",
+            "header": [
+              { "key": "Authorization", "value": "Bearer {{token}}" }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/TodoItems/suggestions/weather?city=",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "TodoItems", "suggestions", "weather"],
+              "query": [{ "key": "city", "value": "" }]
+            },
+            "description": "Missing city parameter. Expected: 400 Bad Request"
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "5. GitHub Integration",
+      "item": [
+        {
+          "name": "POST Import GitHub Issues",
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Authorization", "value": "Bearer {{token}}" }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/TodoItems/import-github-issues",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "TodoItems", "import-github-issues"]
+            },
+            "description": "Import open GitHub issues as todos. Expected: 200 OK with createdTodos count"
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "6. Webhooks",
+      "item": [
+        {
+          "name": "POST Webhook - Todo Created",
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"userId\": 1,\n  \"todoId\": 1,\n  \"action\": \"created\",\n  \"timestamp\": \"2026-06-27T10:00:00Z\",\n  \"title\": \"Buy groceries\",\n  \"priority\": \"High\"\n}",
+              "options": { "raw": { "language": "json" } }
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/Webhooks/todo-created",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "Webhooks", "todo-created"]
+            },
+            "description": "Receive todo created webhook. Expected: 202 Accepted"
+          },
+          "response": []
+        },
+        {
+          "name": "POST Webhook - Todo Created (Invalid Payload)",
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{}",
+              "options": { "raw": { "language": "json" } }
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/Webhooks/todo-created",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "Webhooks", "todo-created"]
+            },
+            "description": "Empty payload test. Expected: 202 Accepted (webhook still processes)"
+          },
+          "response": []
+        },
+        {
+          "name": "POST Webhook - GitHub Issue Opened",
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"action\": \"opened\",\n  \"issue\": {\n    \"number\": 1,\n    \"title\": \"Fix database indexing bottlenecks\",\n    \"body\": \"Database queries are running slow under load.\",\n    \"html_url\": \"https://github.com/peculiarprecious/TODOAPI-Auth/issues/1\",\n    \"labels\": [\n      { \"name\": \"bug\" }\n    ]\n  }\n}",
+              "options": { "raw": { "language": "json" } }
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/Webhooks/github-issue",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "Webhooks", "github-issue"]
+            },
+            "description": "GitHub issue opened webhook. Expected: 202 Accepted"
+          },
+          "response": []
+        },
+        {
+          "name": "POST Webhook - GitHub Issue Closed",
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"action\": \"closed\",\n  \"issue\": {\n    \"number\": 1,\n    \"title\": \"Fix database indexing bottlenecks\",\n    \"body\": \"Fixed and merged!\",\n    \"html_url\": \"https://github.com/peculiarprecious/TODOAPI-Auth/issues/1\",\n    \"labels\": []\n  }\n}",
+              "options": { "raw": { "language": "json" } }
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/Webhooks/github-issue",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "Webhooks", "github-issue"]
+            },
+            "description": "GitHub issue closed - auto-completes matching [GH-1] todo. Expected: 202 Accepted"
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "7. Auth Error Cases",
+      "item": [
+        {
+          "name": "GET My Todos (No Token)",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/TodoItems",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "TodoItems"]
+            },
+            "description": "No auth token. Expected: 401 Unauthorized"
+          },
+          "response": []
+        },
+        {
+          "name": "GET My Todos (Invalid Token)",
+          "request": {
+            "method": "GET",
+            "header": [
+              { "key": "Authorization", "value": "Bearer invalid.token.here" }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/TodoItems",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "TodoItems"]
+            },
+            "description": "Invalid token. Expected: 401 Unauthorized"
+          },
+          "response": []
+        },
+        {
+          "name": "POST Login (Wrong Password)",
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"email\": \"precious@example.com\",\n  \"password\": \"WrongPassword!\"\n}",
+              "options": { "raw": { "language": "json" } }
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/Auth/login",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "Auth", "login"]
+            },
+            "description": "Wrong password. Expected: 401 Unauthorized"
+          },
+          "response": []
+        },
+        {
+          "name": "POST Register (Duplicate Email)",
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"firstName\": \"Precious\",\n  \"lastName\": \"Nwajei\",\n  \"email\": \"precious@example.com\",\n  \"password\": \"Password123!\"\n}",
+              "options": { "raw": { "language": "json" } }
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/Auth/register",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "Auth", "register"]
+            },
+            "description": "Register with existing email. Expected: 400 Bad Request"
+          },
+          "response": []
+        }
+      ]
+    }
+  ]
+}

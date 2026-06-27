@@ -14,11 +14,14 @@ namespace TODOAPI_Auth.Services
     {
         private readonly ApplicationDbContext _context;
         private readonly SlackService _slackService;
+        private readonly GoogleCalendarService _calendarService;
 
-        public TodoService(ApplicationDbContext context, SlackService slackService)
+        public TodoService(ApplicationDbContext context, SlackService slackService, GoogleCalendarService calendarService)
         {
             _context = context;
             _slackService = slackService;
+            _calendarService = calendarService;
+
         }
 
         private static TodoResponseDto MapToResponse(TodoItem todo)
@@ -198,6 +201,11 @@ namespace TODOAPI_Auth.Services
             await _context.SaveChangesAsync();
 
             _ = _slackService.NotifyTodoCreatedAsync(todo, user);
+
+            if (todo.DueDate.HasValue)
+            {
+                _ = _calendarService.CreateCalendarEventAsync(todo);
+            }
 
             return MapToResponse(todo);
         }

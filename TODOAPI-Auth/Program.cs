@@ -26,6 +26,7 @@ builder.Services.AddHttpClient<GitHubService>()
         ServerCertificateCustomValidationCallback =
             (message, cert, chain, errors) => true
     });
+builder.Services.AddHttpClient<GoogleCalendarService>();
 
 // 2. Register Database Context
 builder.Services.AddDbContext<ApplicationDbContext>(options =>
