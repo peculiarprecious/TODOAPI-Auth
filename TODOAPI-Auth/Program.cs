@@ -14,6 +14,8 @@ builder.Services.AddScoped<IJWTHelper, JWTHelper>();
 builder.Services.AddScoped<IAuthService, AuthService>();
 builder.Services.AddScoped<ITodoService, TodoService>();
 builder.Services.AddHttpClient<WeatherService>();
+builder.Services.AddScoped<IFileStorageService, LocalFileStorageService>();
+builder.Services.AddScoped<IFileService, FileService>();
 //builder.Services.AddHttpClient<SlackService>();
 builder.Services.AddHttpClient<SlackService>()
     .ConfigurePrimaryHttpMessageHandler(() => new HttpClientHandler
