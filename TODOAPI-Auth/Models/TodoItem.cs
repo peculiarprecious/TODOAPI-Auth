@@ -1,4 +1,6 @@
-﻿namespace TODOAPI_Auth.Models
+﻿using System.Net.Mail;
+
+namespace TODOAPI_Auth.Models
 {
     public class TodoItem
     {
@@ -14,6 +16,8 @@
         // Foreign Key — links todo to its owner
         public int UserId { get; set; }
         public User User { get; set; } = null!;
+
+        public ICollection<Attachments> Attachments { get; set; } = new List<Attachments>();
 
     }
 }

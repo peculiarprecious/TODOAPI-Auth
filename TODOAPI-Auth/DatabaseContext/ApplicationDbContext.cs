@@ -12,6 +12,7 @@ namespace TODOAPI_Auth.DatabaseContext
         }
         public DbSet<User> Users { get; set; } 
         public DbSet<TodoItem> TodoItems { get; set; }
+        public DbSet<Attachments> Attachments { get; set; }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
@@ -26,7 +27,22 @@ namespace TODOAPI_Auth.DatabaseContext
             modelBuilder.Entity<User>()
                 .HasIndex(u => u.email)
                 .IsUnique();
+
+
+            modelBuilder.Entity<Attachments>()
+               .HasOne(a => a.TodoItem)
+               .WithMany(t => t.Attachments)
+               .HasForeignKey(a => a.TodoItemId)
+               .OnDelete(DeleteBehavior.Cascade); // Deleting a todo deletes its attachments
+
+            // Configure Attachments -> User relationship
+            modelBuilder.Entity<Attachments>()
+                .HasOne(a => a.User)
+                .WithMany(u => u.Attachments)
+                .HasForeignKey(a => a.UploadedBy)
+                .OnDelete(DeleteBehavior.Restrict); // Avoid multiple cascade paths
         }
+
     }
 
 }

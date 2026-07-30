@@ -12,5 +12,7 @@
 
         //One to Many: One user has many TODos
         public List<TodoItem> Todos { get; set; } = new List<TodoItem>(); //Foreign key
+        public ICollection<Attachments> Attachments { get; set; } = new List<Attachments>();
+
     }
 }
