@@ -7,7 +7,10 @@ using TODOAPI_Auth.DatabaseContext;
 using TODOAPI_Auth.Helpers;
 using TODOAPI_Auth.Services;
 
+
 var builder = WebApplication.CreateBuilder(args);
+
+
 
 // 1. Register Custom Business Services
 builder.Services.AddScoped<IJWTHelper, JWTHelper>();
@@ -97,6 +100,7 @@ builder.Services.AddSwaggerGen(options =>
 
 
 var app = builder.Build();
+app.UseMiddleware<TODOAPI_Auth.Middleware.ExceptionHandlingMiddleware>();
 
 
 if (app.Environment.IsDevelopment())
