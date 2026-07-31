@@ -1,4 +1,6 @@
-﻿namespace TODOAPI_Auth.DTOs.AttachmentDTO
+﻿using System.ComponentModel.DataAnnotations;
+
+namespace TODOAPI_Auth.DTOs.AttachmentDTO
 {
    
         public class AttachmentDto
@@ -24,6 +26,11 @@
         public string Message { get; set; } = string.Empty;
         public string Details { get; set; } = string.Empty;
         public DateTime Timestamp { get; set; }
+    }
+    public class CreateAttachmentDto
+    {
+        [Required(ErrorMessage = "An upload file payload must be provided.")]
+        public IFormFile File { get; set; } = null!;
     }
 
 }

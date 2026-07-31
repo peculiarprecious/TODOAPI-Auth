@@ -15,10 +15,10 @@ namespace TODOAPI_Auth.Services
 
         public EmailService(IConfiguration configuration, ILogger<EmailService> logger)
         {
-            _smtpServer = configuration["Email:SmtpServer"];
+            _smtpServer = configuration["Email:SmtpServer"]!;
             _smtpPort = int.Parse(configuration["Email:SmtpPort"] ?? "587");
-            _fromEmail = configuration["Email:FromEmail"];
-            _password = configuration["Email:Password"];
+            _fromEmail = configuration["Email:FromEmail"]!;
+            _password = configuration["Email:Password"]!;
             _logger = logger;
         }
 

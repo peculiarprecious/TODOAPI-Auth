@@ -18,13 +18,25 @@ namespace TODOAPI_Auth.Controllers
         {
             _fileService = fileService;
         }
-        // 1. UPLOAD ATTACHMENT ENDPOINT
+      
         [HttpPost("{todoId}/attachments")]
-        public async Task<ActionResult<AttachmentDto>> UploadAttachment(int todoId, IFormFile file)
+        public async Task<ActionResult<AttachmentDto>> UploadAttachment(int todoId, [FromForm] CreateAttachmentDto dto)
         {
+            
+            if (!ModelState.IsValid)
+            {
+                return BadRequest(new ErrorResponse
+                {
+                    StatusCode = 400,
+                    Message = "Validation failed",
+                    Details = "The uploaded file payload is missing or structurally invalid.",
+                    Timestamp = DateTime.UtcNow
+                });
+            }
+
+            var file = dto.File;
             var userId = GetCurrentUserId();
 
-            // Perform file validation constraints check
             var validation = FileValidator.ValidateFile(file);
             if (!validation.IsValid)
             {
@@ -48,9 +60,10 @@ namespace TODOAPI_Auth.Controllers
             }
             catch (UnauthorizedAccessException ex)
             {
-                return NotFound(ex.Message); // 404 if user doesn’t own TODO
+                return NotFound(ex.Message); // 404 if user doesn’t own TODO (requirement test case)
             }
         }
+
         // 2. GET ATTACHMENTS ENDPOINT
         [HttpGet("{todoId}/attachments")]
         public async Task<ActionResult<IEnumerable<AttachmentDto>>> GetTodoAttachments(int todoId)
